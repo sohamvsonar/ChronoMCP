@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 import py_chronolog_client
 from mcp.server.fastmcp import FastMCP
+import subprocess
+import re
 
 # Load environment variables\load_dotenv()
 
@@ -12,6 +14,9 @@ CHRONO_PORT = int(os.getenv("CHRONO_PORT", 5555))
 CHRONO_TIMEOUT = int(os.getenv("CHRONO_TIMEOUT", 55))
 DEFAULT_CHRONICLE = os.getenv("CHRONICLE_NAME", "LLM")
 DEFAULT_STORY = os.getenv("STORY_NAME", "conversation")
+
+HDF5_READER_BIN = os.getenv("HDF5_READER_BIN", "/home/ssonar/chronolog/Debug/test_1/build/hdf5_file_reader")
+CONF_FILE       = os.getenv("CHRONO_CONF",     "/home/ssonar/chronolog/Debug/conf/grapher_conf_1.json")
 
 # Initialize ChronoLog client
 client_conf = py_chronolog_client.ClientPortalServiceConf(
@@ -96,6 +101,44 @@ async def stop_chronolog() -> str:
     _active_story = None
     _story_handle = None
     return "ChronoLog session stopped and disconnected"
+
+@mcp.tool()
+async def retrieve_interaction(
+    chronicle_name: str = None,
+    story_name:     str = None,
+    start:          int = None,
+    end:            int = None
+) -> str:
+    """
+    Run the C++ HDF5 reader and return its output.
+    """
+    # Determine parameters
+    chronicle = chronicle_name or "LLM"
+    story     = story_name     or "conversation"
+    #HDF5_READER_BIN = os.getenv("HDF5_READER_BIN", "/home/ssonar/chronolog/Debug/test_1/build/hdf5_file_reader")
+
+    # Build command
+    cmd = [HDF5_READER_BIN, "-c", CONF_FILE, "-C", chronicle, "-S", story]
+    if start is not None:
+        cmd += ["-st", str(start)]
+    if end is not None:
+        cmd += ["-et", str(end)]
+
+    try:
+        # Run the reader
+        proc = subprocess.run(
+            cmd,
+            cwd=os.path.dirname(HDF5_READER_BIN),
+            capture_output=True,
+            text=True,
+            #check=True
+            encoding="utf-8",
+            errors="replace",
+        )
+        return proc.stdout
+    except subprocess.CalledProcessError as e:
+        return f"Error running hdf5 reader: {e.stderr or e.stdout}"
+
 
 if __name__ == "__main__":
     mcp.run()
