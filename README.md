@@ -12,6 +12,7 @@ MCP servers allow teams to rapidly spin up domain-specific logging interfaces—
 - **start_chronolog**: Creates a chronicle and acquires a story handle.
 - **record_interaction**: Appends log events to the active story.
 - **stop_chronolog**: Releases the story and disconnects the client.
+- **retrieve_interaction**: Returns the logs or messages from the past.
 
 ## Prerequisites
 
@@ -93,8 +94,8 @@ By default, the server listens for MCP tool invocations and exposes:
    - **Description**: Extracts only the records from a specified chronicle and story, writes them to a timestamped text file. Supports both raw nanosecond timestamps and human-readable dates (e.g. “yesterday”, “2025-04-30”).
    - **Returns**: Generated text file (e.g. records_LLM_conversation_20250502123045.txt), or an error message if the reader fails or finds no record
    - **Use Case samples**: 
-      1.Prompt "retrieve our interaction from yesterday and add  it with the session chat to make a summary."
-      2. Prompt "retrieve yesterday's interaction with chronicle name research and story name systems"
+      - Prompt "retrieve our interaction from yesterday and add  it with the session chat to make a summary."
+      - Prompt "retrieve yesterday's interaction with chronicle name research and story name systems"
 
 ## Extending
 
