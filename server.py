@@ -1,22 +1,33 @@
 import os
+import sys
+import subprocess
+import re
+from datetime import datetime
+import argparse
 from dotenv import load_dotenv
 import py_chronolog_client
 from mcp.server.fastmcp import FastMCP
-import subprocess
-import re
 
-# Load environment variables\load_dotenv()
+# Load environment variables
+load_dotenv()
 
 # ChronoLog configuration from environment or defaults
-CHRONO_PROTOCOL = os.getenv("CHRONO_PROTOCOL", "ofi+sockets")
-CHRONO_HOST = os.getenv("CHRONO_HOST", "127.0.0.1")
-CHRONO_PORT = int(os.getenv("CHRONO_PORT", 5555))
-CHRONO_TIMEOUT = int(os.getenv("CHRONO_TIMEOUT", 55))
-DEFAULT_CHRONICLE = os.getenv("CHRONICLE_NAME", "LLM")
-DEFAULT_STORY = os.getenv("STORY_NAME", "conversation")
+CHRONO_PROTOCOL    = os.getenv("CHRONO_PROTOCOL", "ofi+sockets")
+CHRONO_HOST        = os.getenv("CHRONO_HOST",     "127.0.0.1")
+CHRONO_PORT        = int(os.getenv("CHRONO_PORT",  5555))
+CHRONO_TIMEOUT     = int(os.getenv("CHRONO_TIMEOUT", 55))
+DEFAULT_CHRONICLE  = os.getenv("CHRONICLE_NAME",  "LLM")
+DEFAULT_STORY      = os.getenv("STORY_NAME",      "conversation")
 
-HDF5_READER_BIN = os.getenv("HDF5_READER_BIN", "/home/ssonar/chronolog/Debug/test_1/build/hdf5_file_reader")
-CONF_FILE       = os.getenv("CHRONO_CONF",     "/home/ssonar/chronolog/Debug/conf/grapher_conf_1.json")
+# HDF5 reader binary and ChronoLog config file
+READER_BINARY = os.getenv(
+    "HDF5_READER_BIN",
+    "/home/ssonar/chronolog/Debug/test_1/build/hdf5_file_reader"
+)
+CONFIG_FILE     = os.getenv(
+    "CHRONO_CONF",
+    "/home/ssonar/chronolog/Debug/conf/grapher_conf_1.json"
+)
 
 # Initialize ChronoLog client
 client_conf = py_chronolog_client.ClientPortalServiceConf(
@@ -29,8 +40,8 @@ mcp = FastMCP("chronolog")
 
 # Globals to track active session
 _active_chronicle = None
-_active_story = None
-_story_handle = None
+_active_story     = None
+_story_handle     = None
 
 @mcp.tool()
 async def start_chronolog(chronicle_name: str = None, story_name: str = None) -> str:
@@ -39,7 +50,7 @@ async def start_chronolog(chronicle_name: str = None, story_name: str = None) ->
     """
     global _active_chronicle, _active_story, _story_handle
     chronicle = chronicle_name or DEFAULT_CHRONICLE
-    story = story_name or DEFAULT_STORY
+    story     = story_name or DEFAULT_STORY
 
     # Connect to ChronoVisor
     ret = client.Connect()
@@ -61,8 +72,8 @@ async def start_chronolog(chronicle_name: str = None, story_name: str = None) ->
         return f"Failed to acquire story '{story}' in chronicle '{chronicle}': {ret}"
 
     _active_chronicle = chronicle
-    _active_story = story
-    _story_handle = handle
+    _active_story     = story
+    _story_handle     = handle
     return f"ChronoLog session started: chronicle='{chronicle}', story='{story}'"
 
 @mcp.tool()
@@ -98,47 +109,62 @@ async def stop_chronolog() -> str:
 
     # Clear session state
     _active_chronicle = None
-    _active_story = None
-    _story_handle = None
+    _active_story     = None
+    _story_handle     = None
     return "ChronoLog session stopped and disconnected"
+
 
 @mcp.tool()
 async def retrieve_interaction(
     chronicle_name: str = None,
-    story_name:     str = None,
-    start:          int = None,
-    end:            int = None
+    story_name: str = None,
+    start_time: str = None,
+    end_time: str = None
 ) -> str:
     """
-    Run the C++ HDF5 reader and return its output.
+    Run the HDF5 reader, extract only the 'record' fields,
+    save them to a text file, and return the file path.
     """
-    # Determine parameters
-    chronicle = chronicle_name or "LLM"
-    story     = story_name     or "conversation"
-    #HDF5_READER_BIN = os.getenv("HDF5_READER_BIN", "/home/ssonar/chronolog/Debug/test_1/build/hdf5_file_reader")
+    chronicle = chronicle_name or DEFAULT_CHRONICLE
+    story     = story_name     or DEFAULT_STORY
 
-    # Build command
-    cmd = [HDF5_READER_BIN, "-c", CONF_FILE, "-C", chronicle, "-S", story]
-    if start is not None:
-        cmd += ["-st", str(start)]
-    if end is not None:
-        cmd += ["-et", str(end)]
+    cmd = [
+        "stdbuf", "-o0",
+        READER_BINARY,
+        "-c", CONFIG_FILE,
+        "-C", chronicle,
+        "-S", story
+    ]
+    if start_time:
+        cmd += ["-st", start_time]
+    if end_time:
+        cmd += ["-et", end_time]
 
     try:
-        # Run the reader
-        proc = subprocess.run(
+        result = subprocess.run(
             cmd,
-            cwd=os.path.dirname(HDF5_READER_BIN),
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
-            #check=True
-            encoding="utf-8",
-            errors="replace",
         )
-        return proc.stdout
     except subprocess.CalledProcessError as e:
-        return f"Error running hdf5 reader: {e.stderr or e.stdout}"
+        return f"Error running reader: {e.stderr.strip()}"
 
+    # Extract all record="..."
+    records = re.findall(r'record="([^"]*)"', result.stdout)
+    if not records:
+        return "No records found."
+
+    # Create a timestamped filename
+    ts = datetime.now().strftime("%Y%m%d%H%M%S")
+    filename = f"records_{chronicle}_{story}_{ts}.txt"
+
+    # Write the records to the file
+    with open(filename, "w") as f:
+        f.write("\n".join(records))
+
+    # Return the path to the file
+    return filename
 
 if __name__ == "__main__":
     mcp.run()
