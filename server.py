@@ -7,6 +7,7 @@ import argparse
 from dotenv import load_dotenv
 import py_chronolog_client
 from mcp.server.fastmcp import FastMCP
+from datetime import datetime, date, time, timedelta
 
 # Load environment variables
 load_dotenv()
@@ -113,6 +114,42 @@ async def stop_chronolog() -> str:
     _story_handle     = None
     return "ChronoLog session stopped and disconnected"
 
+def to_nanosecond(dt: datetime) -> str:
+    # nanoseconds since Unix epoch
+    return str(int(dt.timestamp() * 1e9))
+
+def parse_time_arg(arg: str, is_end: bool) -> str:
+    """
+    If arg is all digits, assume it's already nanoseconds.
+    Else if it's 'yesterday', 'today', 'tomorrow', or YYYY-MM-DD,
+    convert to a datetime at start/end of that day and return nanoseconds.
+    """
+    if arg.isdigit():
+        return arg
+
+    a = arg.strip().lower()
+    now = datetime.now()
+
+    if a == "yesterday":
+        d = (now - timedelta(days=1)).date()
+    elif a == "today":
+        d = now.date()
+    elif a == "tomorrow":
+        d = (now + timedelta(days=1)).date()
+    else:
+        # try ISO date
+        try:
+            d = datetime.fromisoformat(arg).date()
+        except ValueError:
+            raise ValueError(f"Unrecognized date: {arg!r}")
+
+    # pick start or end of that day
+    if is_end:
+        dt = datetime.combine(d, time(hour=23, minute=59, second=59, microsecond=999999))
+    else:
+        dt = datetime.combine(d, time.min)
+
+    return to_nanosecond(dt)
 
 @mcp.tool()
 async def retrieve_interaction(
@@ -136,10 +173,19 @@ async def retrieve_interaction(
         "-S", story
     ]
     if start_time:
-        cmd += ["-st", start_time]
-    if end_time:
-        cmd += ["-et", end_time]
+        try:
+            st_ns = parse_time_arg(start_time, is_end=False)
+        except ValueError as e:
+            return str(e)
+        cmd += ["-st", st_ns]
 
+    if end_time:
+        try:
+            et_ns = parse_time_arg(end_time, is_end=True)
+        except ValueError as e:
+            return str(e)
+        cmd += ["-et", et_ns]
+    print(cmd)
     try:
         result = subprocess.run(
             cmd,

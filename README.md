@@ -89,6 +89,13 @@ By default, the server listens for MCP tool invocations and exposes:
    - **Description**: Releases the story handle and disconnects from ChronoLog.
    - **Returns**: Confirmation of clean shutdown.
 
+4. **retrieve_interaction()**
+   - **Description**: Extracts only the records from a specified chronicle and story, writes them to a timestamped text file. Supports both raw nanosecond timestamps and human-readable dates (e.g. “yesterday”, “2025-04-30”).
+   - **Returns**: Generated text file (e.g. records_LLM_conversation_20250502123045.txt), or an error message if the reader fails or finds no record
+   - **Use Case samples**: 
+      1.Prompt "retrieve our interaction from yesterday and add  it with the session chat to make a summary."
+      2. Prompt "retrieve yesterday's interaction with chronicle name research and story name systems"
+
 ## Extending
 
 Working on additional tools and features, will keep updating.
