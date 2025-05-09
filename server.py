@@ -159,6 +159,8 @@ async def retrieve_interaction(
     end_time: str = None
 ) -> str:
     """
+    Do not assume the chronicle name and story name.
+    If not provided, use the default values.
     Run the HDF5 reader, extract only the 'record' fields,
     save them to a text file, and return the file path.
     """
