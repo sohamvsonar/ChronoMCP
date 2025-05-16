@@ -87,10 +87,10 @@ Add the following to your `settings.json` file on Claude or any other client:
 }
 ```
 
- ![](https://github.com/sohamvsonar/ChronoMCP/blob/main/assets/mcp-retrievecopilot.png)
+ ![](https://github.com/sohamvsonar/ChronoMCP/blob/main/assets/mcp-retievecopilot.png)
 
  ![](https://github.com/sohamvsonar/ChronoMCP/blob/main/assets/mcp-retrieve-diseasepred.png)
- 
+
 ## Usage
 
 Run the MCP server or client to register the ChronoLog tools:
