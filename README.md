@@ -1,11 +1,13 @@
 # ChronoLog MCP Server
 
-An MCP (Model Context Protocol) server that integrates with ChronoLog for high-performance event logging and retrieval. This server exposes tools to manage interactions between LLM's and User's, making it easy to capture and retrieve events in a structured format.
+An MCP (Model Context Protocol) server that integrates with ChronoLog, a scalable, high-performance distributed shared log store. This server exposes tools to manage interactions between LLM's and User's, making it easy to capture and retrieve events in a structured format.
 
 ## Detailed Description
 
 The MCP server provides a unified architecture for both real-time capturing of conversation (prompts and responses) and long-term playback of structured event sequences using custom tools, along with additional features such as semantic search, and automated generation and storage of session summaries.
 MCP servers allow teams to rapidly spin up domain-specific logging interfaces—whether for  R&D notebooks, mental-health tracking, or real-time chat systems—without reinventing the I/O layer.
+
+The MCP server isn’t limited to a single LLM or user session—multiple clients and LLM instances can connect simultaneously, read from one another’s chronicles, and share context in real time
 
 ## Features
 
@@ -25,20 +27,13 @@ MCP servers allow teams to rapidly spin up domain-specific logging interfaces—
 
 ## ChronoLog Deployment
 
-For ChronoLog deployment, refer to [First Steps with ChronoLog](https://github.com/grc-iit/ChronoLog/wiki/Tutorial-1:-First-Steps-with-ChronoLog).
-
-Ensure Python bindings by adding the following to your shell configuration (e.g., `.bashrc` or `.zshrc`):
-
-```bash
-export LD_LIBRARY_PATH=$HOME/chronolog/Debug/lib:$LD_LIBRARY_PATH
-export PYTHONPATH=$HOME/chronolog/Debug/lib:$PYTHONPATH
-
-ln -s /path/to/chronolog/lib/py_chronolog_client.[python-version-linux-version].so /path/to/chronolog/lib/py_chronolog_client.so
-```
+For ChronoLog Installation and Deployment, refer to [ChronoLog Setup](https://github.com/sohamvsonar/ChronoMCP/Chronolog_setup.md).
 
 ## Custom MCP Client
 
 A command-line client that connects to the ChronoLog MCP server, uses Google Gemini as the LLM, and automatically records every user ↔ assistant exchange back into ChronoLog.
+
+With the Custom MCP Client you do not need to invoke the record_interaction tool as it automatically invokes the tool and stores each conversation between the user and assistant in real time.
 
 **.env example**
    ```bash
@@ -62,12 +57,19 @@ A command-line client that connects to the ChronoLog MCP server, uses Google Gem
    uv run client.py
    ```
 
+### Usage
+
+1. Start Chronolog
+2. Have Conversation
+3. Retrieve Interaction
+4. Stop Chronolog
+
  ![](https://github.com/sohamvsonar/ChronoMCP/blob/main/assets/mcp-client.png)
 
 ## Open Source MCP Client
 
 You can connect the mcp server with any of the open source MCP Clients such as Microsoft Visual Studio Copilot, Claude AI, Windsurf,etc.
-Simply add the configuration below to your Clients settings.josn and start the server the tools will automatically get loaded in your client.
+Simply add the configuration below to your Clients settings.json and start the server, the tools will automatically get loaded in your client.
 
 ### Configuration
 
@@ -86,6 +88,8 @@ Add the following to your `settings.json` file on Claude or any other client:
   }
 }
 ```
+
+Some Samples from Visual Studio Copilot:
 
  ![](https://github.com/sohamvsonar/ChronoMCP/blob/main/assets/mcp-retievecopilot.png)
 
