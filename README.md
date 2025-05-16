@@ -122,6 +122,26 @@ By default, the server listens for MCP tool invocations and exposes:
       - Prompt "retrieve our interaction from yesterday and add  it with the session chat to make a summary."
       - Prompt "retrieve yesterday's interaction with chronicle name research and story name systems"
 
+## Directory Structure
+
+```
+ChronoMCP/
+├── assets                 # Images
+├── README.md              # ← This file
+├── Chronolog_setup.md     # ChronoLog Installation and deployment guide
+├── pyproject.toml         # Python package config
+├── uv.lock                # Dependency lock file
+└── src/
+      ├── client.py      # Gemini-based interactive client
+      ├── server.py      # ChronoLog MCP Server
+      └── reader_script/
+         ├── build           # reader build
+         ├── reader.cpp      # Reader cpp script
+         ├── CMAKELists.txt  # CMake to build cpp script
+         ├── HDF5ArchiveReadingAgent.h    # header file
+```
+
+
 ## Extending
 
 We’re actively working on additional improvements (search, summaries, analytics, etc.). Contributions and feature requests are welcome!
