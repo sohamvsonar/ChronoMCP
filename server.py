@@ -1,5 +1,5 @@
 import os
-import sys
+import sys, logging 
 import subprocess
 import re
 from datetime import datetime
@@ -11,6 +11,13 @@ from datetime import datetime, date, time, timedelta
 
 # Load environment variables
 load_dotenv()
+
+# Set up logging
+logging.basicConfig(
+    level=logging.WARNING,       # only WARNING and above will be emitted
+    stream=sys.stderr            # send logs to stderr (so they don’t mix with stdout protocol)
+)
+
 
 # ChronoLog configuration from environment or defaults
 CHRONO_PROTOCOL    = os.getenv("CHRONO_PROTOCOL", "ofi+sockets")
@@ -37,7 +44,7 @@ client_conf = py_chronolog_client.ClientPortalServiceConf(
 client = py_chronolog_client.Client(client_conf)
 
 # Initialize MCP server
-mcp = FastMCP("chronolog")
+mcp = FastMCP("chronologMCP")
 
 # Globals to track active session
 _active_chronicle = None
@@ -159,10 +166,7 @@ async def retrieve_interaction(
     end_time: str = None
 ) -> str:
     """
-    Do not assume the chronicle name and story name.
-    If not provided, use the default values.
-    Run the HDF5 reader, extract only the 'record' fields,
-    save them to a text file, and return the file path.
+    Retrieve all records from a chronicle and story within the specified time range.
     """
     chronicle = chronicle_name or DEFAULT_CHRONICLE
     story     = story_name     or DEFAULT_STORY
@@ -187,7 +191,6 @@ async def retrieve_interaction(
         except ValueError as e:
             return str(e)
         cmd += ["-et", et_ns]
-    print(cmd)
     try:
         result = subprocess.run(
             cmd,
