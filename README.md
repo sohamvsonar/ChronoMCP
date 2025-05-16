@@ -27,7 +27,7 @@ The MCP server isn’t limited to a single LLM or user session—multiple client
 
 ## ChronoLog Deployment
 
-For ChronoLog Installation and Deployment, refer to [ChronoLog Setup](https://github.com/sohamvsonar/ChronoMCP/Chronolog_setup.md).
+For ChronoLog Installation and Deployment, refer to [ChronoLog Setup](https://github.com/sohamvsonar/ChronoMCP/blob/main/Chronolog_setup.md).
 
 ## Custom MCP Client
 

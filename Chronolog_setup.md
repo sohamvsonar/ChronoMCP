@@ -107,6 +107,16 @@ export PYTHONPATH=$HOME/chronolog/Debug/lib:$PYTHONPATH
 ln -s /path/to/chronolog/lib/py_chronolog_client.[python-version-linux-version].so /path/to/chronolog/lib/py_chronolog_client.so
 ```
 
+## Step 8: Launch the Interactive Client Admin
+
+Let’s fire up the interactive client! Open your terminal, navigate to the /bin directory on the location where ChronoLog is installed, and run:
+
+```bash
+./client_admin -i -c ../conf/visor_conf.json
+```
+
+Feel free to test and explore the chronolog operations.
+
 ### Reader Script
 
 Make sure to place the reader script folder from src/reader_script into your chronolog installation folder - 
