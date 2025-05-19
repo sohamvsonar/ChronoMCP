@@ -133,7 +133,7 @@ make
 ```
 
 Test the hdf5 file reader by - 
-/$HOME/chronolog/Debug./hdf5_file_reader -c /$HOME/chronolog/Debug/conf/grapher_conf_1.json
+/$HOME/chronolog/Debug/reader_script/build/./hdf5_file_reader -c /$HOME/chronolog/Debug/conf/grapher_conf_1.json
 
 
 Please follow all the steps carefully, feel free to make an issue if there's any problem setting up the chronolog.
