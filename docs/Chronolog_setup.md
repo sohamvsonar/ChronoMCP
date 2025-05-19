@@ -124,7 +124,7 @@ e.g $HOME/chronolog/Debug/reader_script
 
 Build the reader script.
 ```bash
-cd build
+mkdir build && cd build
 cmake ..
 ```
 
