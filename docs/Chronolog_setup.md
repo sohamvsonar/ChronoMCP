@@ -122,8 +122,15 @@ Feel free to test and explore the chronolog operations.
 Make sure to place the reader script folder from src/chronomcp/reader_script into your chronolog installation folder - 
 e.g $HOME/chronolog/Debug/reader_script
 
+Make sure to activate chronolog spack environment to load all the required libraries.
+```bash
+cd ChronoLog
+spack env activate -p .
+```
+
 Build the reader script.
 ```bash
+cd chronolog/Debug/reader_script
 mkdir build && cd build
 cmake ..
 ```
