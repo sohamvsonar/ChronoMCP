@@ -119,19 +119,21 @@ Feel free to test and explore the chronolog operations.
 
 ### Reader Script
 
-Make sure to place the reader script folder from src/reader_script into your chronolog installation folder - 
+Make sure to place the reader script folder from src/chronomcp/reader_script into your chronolog installation folder - 
 e.g $HOME/chronolog/Debug/reader_script
 
-Test the hdf5 file reader by - 
-$HOME/chronolog/Debug./hdf5_file_reader -c /home/ssonar/chronolog/Debug/conf/grapher_conf_1.json
-
-IF it does not run properly, clear the build and rebuild.
+Build the reader script.
 ```bash
+cd build
 cmake ..
 ```
 
 ```bash
 make
 ```
+
+Test the hdf5 file reader by - 
+/$HOME/chronolog/Debug./hdf5_file_reader -c /$HOME/chronolog/Debug/conf/grapher_conf_1.json
+
 
 Please follow all the steps carefully, feel free to make an issue if there's any problem setting up the chronolog.
