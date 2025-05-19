@@ -4,10 +4,10 @@ An MCP (Model Context Protocol) server that integrates with ChronoLog, a scalabl
 
 ## Detailed Description
 
-The MCP server provides a unified architecture for both real-time capturing of conversation (prompts and responses) and long-term playback of structured event sequences using custom tools, along with additional features such as semantic search, and automated generation and storage of session summaries.
+The MCP server provides a unified architecture for both real-time capturing of conversation (prompts and responses) and long-term playback of structured event sequences using custom tools, along with additional features such as automated generation and storage of session summaries.
 MCP servers allow teams to rapidly spin up domain-specific logging interfaces—whether for  R&D notebooks, mental-health tracking, or real-time chat systems—without reinventing the I/O layer.
 
-The MCP server isn’t limited to a single LLM or user session—multiple clients and LLM instances can connect simultaneously, read from one another’s chronicles, and share context in real time
+The MCP server isn’t limited to a single LLM or user session, multiple clients and LLM instances can connect simultaneously, read from one another’s chronicles, and share context in real time.
 
 ## Features
 
@@ -126,19 +126,27 @@ By default, the server listens for MCP tool invocations and exposes:
 
 ```
 ChronoMCP/
-├── assets                 # Images
+├── assets                 #images
 ├── README.md              # ← This file
-├── Chronolog_setup.md     # ChronoLog Installation and deployment guide
+├── docs                   # ChronoLog Installation and deployment guide
 ├── pyproject.toml         # Python package config
 ├── uv.lock                # Dependency lock file
 └── src/
-      ├── client.py      # Gemini-based interactive client
-      ├── server.py      # ChronoLog MCP Server
-      └── reader_script/
-         ├── build           # reader build
-         ├── reader.cpp      # Reader cpp script
-         ├── CMAKELists.txt  # CMake to build cpp script
-         ├── HDF5ArchiveReadingAgent.h    # header file
+    └── chronomcp/
+        ├── server.py                           # ChronoLog MCP Server
+        ├── capabilities/                       # MCP Capabilities (start, record, retrieve, stop)
+        │   ├── start_handler.py
+        │   ├── record_handler.py
+        │   ├── stop_handler.py
+        │   └── retrieve_handler.py
+        ├── util/
+        │   ├── config.py                       # Chronolog client config
+        │   └── helpers.py                      # Time parsing and reader function
+        └── reader_script/                      # reader emulator
+            ├── build
+            ├── reader.cpp
+            ├── CMakeLists.txt
+            └── HDF5ArchiveReadingAgent.h
 ```
 
 
