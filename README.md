@@ -126,7 +126,7 @@ By default, the server listens for MCP tool invocations and exposes:
 
 ```
 ChronoMCP/
-├── assets                 #images
+├── assets                 # Images
 ├── README.md              # ← This file
 ├── docs                   # ChronoLog Installation and deployment guide
 ├── pyproject.toml         # Python package config
